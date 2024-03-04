@@ -1,0 +1,46 @@
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+
+# Exclude all .tfvars files, which might contain sensitive data, such as
+# password, private keys, and other secrets. Alternatively, you can choose to
+# include specific tfvars files using the '!' operator.
+*.tfvars
+!example.tfvars
+
+# Ignore override files as they are usually used to override resources locally and
+# are not checked in
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Ignore any .env files as they may contain sensitive variables
+.env
+
+# Ignore the SSH key files if they are used and managed within the project
+*.pem
+*.key
+
+# Ignore files that may contain output from terraform plan, apply or destroy
+terraform.tfplan
+terraform.tfplan.*
+*.tfstate.backup
+
+# Ignore IDE and editor directories and files
+.idea/
+*.bak
+*.swp
+*.swo
+.vscode/
+*.code-workspace
