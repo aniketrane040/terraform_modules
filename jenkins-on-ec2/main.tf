@@ -48,7 +48,9 @@ resource "aws_security_group" "jenkins_sg" {
 resource "aws_instance" "jenkins" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  #   key_name      = var.key_name
+  key_name      = var.key_name
+
+  associate_public_ip_address = true
 
   subnet_id = var.subnet-id
 
