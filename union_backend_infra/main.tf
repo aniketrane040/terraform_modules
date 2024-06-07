@@ -49,52 +49,6 @@ resource "aws_security_group" "union_sg" {
   }
 }
 
-resource "aws_ecs_task_definition" "union_task_def" {
-  family                   = "union_task_def"
-  requires_compatibilities = ["FARGATE"]
-  cpu                      = "1024"
-  memory                   = "2048"
-
-  container_definitions = jsonencode([
-    {
-      name   = "union_backend_container"
-      image  = "public.ecr.aws/m7p9x7q8/union-backend-app:latest"
-      cpu    = 512
-      memory = 512
-      portMappings = [
-        {
-          container_port = 3000
-          host_port      = 3000
-        }
-      ]
-      environment = [
-        {
-          name  = "CONNECTION_URL"
-          value = ""
-        },
-        {
-          name  = "PORT"
-          value = "3000"
-        }
-      ]
-    }
-  ])
-}
-
-resource "aws_ecs_cluster" "union_cluster" {
-  name = "union_cluster"
-}
-
-resource "aws_ecs_service" "union_service" {
-  name            = "union_service"
-  cluster         = aws_ecs_cluster.union_cluster.id
-  task_definition = aws_ecs_task_definition.union_task_def.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
-
-  depends_on = [aws_ecs_cluster.union_cluster]
-}
-
 resource "aws_lb" "union_alb" {
   name               = "union-alb"
   internal           = false
@@ -130,5 +84,64 @@ resource "aws_lb_listener" "union_listener" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.union_tg.arn
+  }
+}
+
+resource "aws_ecs_task_definition" "union_task_def" {
+  family                   = "union_task_def"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "1024"
+  memory                   = "2048"
+
+  container_definitions = jsonencode([
+    {
+      name   = "union_backend_container"
+      image  = "public.ecr.aws/m7p9x7q8/union-backend-app:latest"
+      cpu    = 512
+      memory = 512
+      portMappings = [
+        {
+          containerPort = 3000
+          hostPort      = 3000
+        }
+      ]
+      environment = [
+        {
+          name  = "CONNECTION_URL"
+          value = ""
+        },
+        {
+          name  = "PORT"
+          value = "3000"
+        }
+      ]
+    }
+  ])
+}
+
+resource "aws_ecs_cluster" "union_cluster" {
+  name = "union_cluster"
+}
+
+resource "aws_ecs_service" "union_service" {
+  name            = "union_service"
+  cluster         = aws_ecs_cluster.union_cluster.id
+  task_definition = aws_ecs_task_definition.union_task_def.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  depends_on = [aws_ecs_cluster.union_cluster]
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.union_tg.arn
+    container_name   = "union_backend_container"
+    container_port   = 3000
+  }
+
+  network_configuration {
+    assign_public_ip = true # Set to "DISABLED" if not needed
+    subnets         = data.aws_subnet_ids.selected.ids # List your subnet IDs
+    security_groups = [aws_security_group.union_sg.id]  # List your SG IDs
   }
 }
