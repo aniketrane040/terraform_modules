@@ -9,6 +9,14 @@ terraform {
   required_version = ">= 1.2.0"
 }
 
+terraform {
+  backend "s3" {
+    bucket = "jenkins-terraform-infra-state"
+    key    = "jenkins/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
 provider "aws" {
   region = "us-east-1"
 }
