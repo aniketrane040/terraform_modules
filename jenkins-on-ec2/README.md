@@ -8,4 +8,4 @@ http://ec2_ip_dns:8080
 
 Retrieve the password with the following command:
  
-     > sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+     sudo cat /var/lib/jenkins/secrets/initialAdminPassword
